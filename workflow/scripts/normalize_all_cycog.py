@@ -168,6 +168,15 @@ def main():
     read_name_taxa_fpath = Path(snakemake.input['read_name_taxa_file'])  # path to file that maps read name to its taxa 
     normalized_output_fpath = snakemake.output['normalized_output']  # normalized output fpath 
 
+    # handle empty input files (no Pro/Syn reads in sample)
+    if diamond_fpath.stat().st_size == 0 or read_name_taxa_fpath.stat().st_size == 0:
+        print(f"Empty input file(s) for {diamond_fpath.stem} — no Pro/Syn reads. Writing empty output.")
+        df = pd.DataFrame({
+            'sample_name': [], 'genus': [], 'clade': [], 'alignment_length': [], 'genome_equivalents': [], 
+        })
+        df.to_csv(normalized_output_fpath, sep='\t', index=False, header=False)
+        return
+
     # obtain sample name from diamond file path 
     sample_name = diamond_fpath.stem
 

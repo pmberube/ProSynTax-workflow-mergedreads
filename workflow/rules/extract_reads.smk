@@ -7,10 +7,10 @@ rule kaiju_name_extract:
     shell:
         """
         # obtain name of reads whose classification contains Pro/Syn 
-        grep -E "Prochlorococcus|Synechococcus" {input.kaiju_name} | cut -f2 > {output.read_name_file}
+        grep -E "Prochlorococcus|Synechococcus" {input.kaiju_name} | cut -f2 > {output.read_name_file} || true
 
         # obtain name and full taxonomic classification of reads whose classification contains Pro/Syn 
-        grep -E "Prochlorococcus|Synechococcus" {input.kaiju_name} | cut -f2,4 > {output.read_name_taxa_file}
+        grep -E "Prochlorococcus|Synechococcus" {input.kaiju_name} | cut -f2,4 > {output.read_name_taxa_file} || true
         """
 
 rule extract_fastq_reads:

@@ -8,11 +8,15 @@ rule blast_reads:
         "../envs/diamond-blast.yaml"
     shell:
         """
-        diamond blastx \
-            --query {input.merged_prosyn_reads} \
-            --db {input.diamond_db} \
-            --out {output.diamond_out} \
-            --threads {resources.cpus_per_task} \
-            --outfmt 6 qseqid sseqid pident nident length qstart qend sstart send evalue bitscore \
-            --max-target-seqs 1
+        if [ -s {input.merged_prosyn_reads} ]; then
+            diamond blastx \
+                --query {input.merged_prosyn_reads} \
+                --db {input.diamond_db} \
+                --out {output.diamond_out} \
+                --threads {resources.cpus_per_task} \
+                --outfmt 6 qseqid sseqid pident nident length qstart qend sstart send evalue bitscore \
+                --max-target-seqs 1
+        else
+            touch {output.diamond_out}
+        fi
         """
