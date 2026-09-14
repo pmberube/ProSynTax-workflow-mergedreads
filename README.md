@@ -43,12 +43,21 @@ Adapter and quality trimming are dropped from the workflow because both are assu
 
 - `inputs/example/` still contains paired-end example data, and `inputs/example/make_samples_tsv.py` still writes the upstream three-column schema, so the bundled example does not run against this version.
 - The workflow diagram in `docs/images/figure2.svg` depicts the upstream paired-end pipeline.
-- `inputs/cycog_len.tsv` contains 423 entries, although the dataset is described as 424 single-copy core CyCOGs throughout this documentation. The normalization denominator is the sum of whatever that file contains.
 
 ## Bug Fix June 2026. 
 A bug was identified that resulted in undercounting genome equivalents by a factor of 3. In the normalization by average cycog length, the denominator was expressed in terms of nucleotides rather than amino acids (script "normalize_all_cycog.py"). This calculation is updated in the bug fix branch "GE_bugFix". 
 
 This fork carries that fix, and goes one step further: the denominator is not hardcoded at all. `normalize_all_cycog.py` sums the mean lengths in `inputs/cycog_len.tsv` at runtime, so the denominator and the CyCOG filter list are always drawn from the same rows of the same file and cannot drift apart.
+
+## Restored 424th core CyCOG
+
+`inputs/cycog_len.tsv` as distributed upstream held only **423** of the 424 single-copy core CyCOGs. The missing entry is **CyCOG_60001271** (Protein of unknown function, DUF2518; 387 genes; mean length 157.73385012919897 aa). The same record is damaged in the Zenodo `average_cycog_length.csv`, whose final line reads `CyCOG_60001271,` with no value and no trailing newline — both files were truncated at the same last record.
+
+The core set was reconstructed to confirm this. The 423 published CyCOGs are present in exactly one copy in exactly 93 genomes (67 *Prochlorococcus*, 26 *Synechococcus*); asking in turn which CyCOGs are single-copy in all 93 of those genomes returns exactly 424, being the published 423 plus CyCOG_60001271, and matching the 424 identifiers listed in the Zenodo CSV. Mean lengths were recomputed from `CyCOG6_clean_prokkafmt_simple.faa` over all genes assigned to each CyCOG; all 423 published values were reproduced exactly (maximum absolute difference 0.0).
+
+This fork ships the complete 424-entry table, which raises the denominator from 119801.5464 to 119959.2802. **Restoring the entry does not systematically shift genome equivalents.** `normalize_all_cycog.py` filters reads to exactly the CyCOGs listed in this file and then divides by the summed mean length of those same CyCOGs, so the estimator is self-consistent at any marker-set size and a 423-marker table is no more biased than a 424-marker one. Adding the marker raises the denominator by 157.73 aa, and for a clade present at G genome equivalents it simultaneously raises the numerator by roughly G x 157.73 aa as reads best-matching CyCOG_60001271 now pass the filter. The two changes cancel.
+
+CyCOG_60001271 is a single-copy core gene, present in every genome of the reference set, so it recruits reads wherever *Prochlorococcus* or *Synechococcus* are present in a sample. The cancellation therefore holds in practice as well as in principle, and per-sample values move only slightly, in either direction, with read sampling on one additional marker. The complete table is shipped because it is correct and because one more marker contributes marginally more sequence to each estimate, not because it changes results.
 
 ## Table of Contents
 * [About this fork](#about-this-fork)
@@ -272,7 +281,7 @@ Below is a description of the steps in ProSynTax workflow.
   - Using the custom Python script `normalize_all_cycog.py`, reads are normalized by clade following these steps: 
     - Filter for reads with hits to the CyCOGs listed in `inputs/cycog_len.tsv` 
     - Obtain sum of alignment length 
-    - Divide that sum by the total CyCOG length, computed at runtime as the sum of column 2 of `inputs/cycog_len.tsv` (119801.5464 for the file as shipped) 
+    - Divide that sum by the total CyCOG length, computed at runtime as the sum of column 2 of `inputs/cycog_len.tsv` (119959.2802 for the file as shipped) 
       - DIAMOND reports alignment length in amino acids and `cycog_len.tsv` is in amino acids, so numerator and denominator share units. See [Bug Fix June 2026](#bug-fix-june-2026) above. 
   - All normalized output files are aggregated into file results table `normalized_counts.tsv`. 
   - A sample in which Kaiju finds no *Prochlorococcus* or *Synechococcus* reads yields an empty entry rather than aborting the run.
