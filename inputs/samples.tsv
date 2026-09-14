@@ -1,3 +1,2 @@
-sample	reverse read	forward read
-ProSyn-s2	inputs/example/raw_reads/ProSyn-s2_2.fastq	inputs/example/raw_reads/ProSyn-s2_1.fastq
-ProSyn-s1	inputs/example/raw_reads/ProSyn-s1_2.fastq	inputs/example/raw_reads/ProSyn-s1_1.fastq
+sample	merged_read
+SAMPLENAME	/PATH/TO/MERGED/FASTQ

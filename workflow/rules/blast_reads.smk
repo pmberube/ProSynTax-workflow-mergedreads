@@ -1,6 +1,6 @@
 rule blast_reads:
     input:
-        fwd_prosyn_reads= scratch_dict["prosyn_reads"]["extracted_reads"] / "{sample}_fwd.fasta", 
+        merged_prosyn_reads= scratch_dict["prosyn_reads"]["extracted_reads"] / "{sample}_merged.fasta", 
         diamond_db = Path(config["input"]["diamond_file"]),
     output:
         diamond_out = scratch_dict["diamond_blast"] / "{sample}.tsv",
@@ -9,7 +9,7 @@ rule blast_reads:
     shell:
         """
         diamond blastx \
-            --query {input.fwd_prosyn_reads} \
+            --query {input.merged_prosyn_reads} \
             --db {input.diamond_db} \
             --out {output.diamond_out} \
             --threads {resources.cpus_per_task} \

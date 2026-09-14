@@ -1,7 +1,6 @@
 rule kaiju_run:
     input:
         r1 = scratch_dict["trimmed_reads"] / "{sample}_1_trimmed.fastq.gz",
-        r2 = scratch_dict["trimmed_reads"] / "{sample}_2_trimmed.fastq.gz",
         nodes = Path(config["input"]["nodes_file"]),
         names = Path(config["input"]["names_file"]),
         fmi = Path(config["input"]["fmi_file"]),
@@ -15,7 +14,7 @@ rule kaiju_run:
             -z {resources.cpus_per_task} \
             -m 11 -s 65 -E 0.05 -x \
             -e 5 -t {input.nodes} -f {input.fmi} \
-            -i {input.r1} {input.r2} \
+            -i {input.r1} \
             -o {output}
         """
 
