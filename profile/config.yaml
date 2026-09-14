@@ -8,48 +8,34 @@ keep-incomplete: False
 
 # conda specifications
 use-conda: True
-conda-frontend: mamba
-# conda-prefix: path/to/conda/installations  # useful if you have a previous package installation of the pipeline
+conda-frontend: conda
 
-# unlock: True  
-# dry-run: False  # useful to see
+# Use the SLURM executor plugin (replaces the old --cluster flag)
+executor: slurm
 
+# number of jobs running at once
+jobs: 10
 
-# SLURM Specifications
-cluster: 
-  mkdir -p logs/{rule} &&
-  sbatch
-    --partition={resources.partition}
-    --ntasks={resources.tasks}
-    --cpus-per-task={resources.cpus_per_task}
-    --mem={resources.mem}
-    --time={resources.time}
-    --job-name={rule}-%j
-    --output="logs/{rule}/{wildcards}.out"
-    --error="logs/{rule}/{wildcards}.err"
+# Default SLURM resources
+default-resources:
+  - slurm_partition="mit_preemptable"
+  - slurm_account="mit_general"
+  - slurm_extra="'--requeue'"
+  - runtime=43200
+  - mem_mb=48000
+  - cpus_per_task=1
+  - tasks=1
 
-
-# HPC Resource Specifications 
-# number of jobs/processes/samples running at once 
-jobs: 5  
-
-# adjust as needed (increase time and mem if input files are large)
-default-resources: 
-  - partition="define_your_partition"
-  - time="1-0"  # adjust according to partition 
-  - mem=50000  # adjust according to partition 
-  - cpus_per_task=1  # do not change; most rules are not multi-threaded 
-  - tasks=1  # do not change; all rules only require 1 task 
-
-# adjust as needed (increase cpus_per_task and mem if input files are large)
+# Per-rule overrides
 set-resources:
-  # multi-threaded rules (allocate more cores)
-  - run_trim_PE:cpus_per_task=10
-  - kaiju_run:cpus_per_task=10
-  - blast_reads:cpus_per_task=10
-
-  # memory intensive rules
-  - run_trim_PE:mem=100000
-  - kaiju_run:mem=100000
-  - blast_reads:mem=100000
-  - normalize_reads:mem=100000
+  run_trim_PE:
+    cpus_per_task: 10
+    mem_mb: 192000
+  kaiju_run:
+    cpus_per_task: 10
+    mem_mb: 192000
+  blast_reads:
+    cpus_per_task: 10
+    mem_mb: 64000
+  normalize_reads:
+    mem_mb: 64000
