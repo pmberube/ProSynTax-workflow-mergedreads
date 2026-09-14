@@ -3,4 +3,4 @@ channels:
 - bioconda
 - defaults
 dependencies:
-- bbmap=39.18
+- bbmap=39.37
