@@ -12,5 +12,5 @@ classification_summary:
   # list of genus to extract read count for (remaining genus will be summed into "other_genus")
   genus_list: ['Synechococcus', 'Prochlorococcus', 'unclassified']
 
-scratch directory: scratch
-results directory: results
+scratch directory: /path/to/scratch
+results directory: /path/to/results
