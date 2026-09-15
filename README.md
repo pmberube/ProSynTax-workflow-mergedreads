@@ -207,7 +207,7 @@ Below is a description of the steps in ProSynTax workflow.
   - Using the custom Python script `normalize_all_cycog.py`, reads are normalized by clade following these steps: 
     - Filter for reads with hits to the 424 CyCOGs protein database 
     - Obtain sum of alignment length 
-    - Divide alignment length of read mapped to CyCOG by the sum of 424 CyCOG mean length, which is 59404.6391
+    - Divide alignment length of read mapped to CyCOG by the sum of the CyCOG mean lengths in `inputs/cycog_len.tsv`, computed at runtime
   - All normalized output files are aggregated into file results table `normalized_counts.tsv`. 
 
 
